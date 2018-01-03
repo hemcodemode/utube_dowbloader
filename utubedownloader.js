@@ -197,7 +197,7 @@ if (video_page == "fb") {
                         var qualClass = Representation[i].getAttribute("FBQualityClass");
                         var baseurl = Representation[i].getElementsByTagName('BaseURL')[0].innerHTML.replace('&amp;','&');
                         var newTitle = title+' '+quallabel+' '+quallabel;
-                        drop.innerHTML += String(i+1)+". <a href='" + baseurl + "' type='video/mp4' title='Hd' download='  target='_blank'" + title + ".mp4' >" + newTitle + ".mp4</a></br>";
+                        drop.innerHTML += String(i+1)+". <a href='" + baseurl + "' type='video/mp4' title='Hd'   target='_blank' download='" + title + ".mp4' >" + newTitle + ".mp4</a></br>";
                         
                     }
                     
