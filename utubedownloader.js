@@ -82,6 +82,7 @@ ispan.style.position = 'absolute';
 ispan.style.zIndex = '1000';
 ispan.style.top = '50px';
 ispan.style.left = '250px';
+ispan.innerHTML = 'Loading......';
 
 drop.style.position = 'absolute';
 drop.style.left = '250px';
