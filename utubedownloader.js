@@ -7,7 +7,13 @@ function newXHR() {
             if(realXHR.responseURL.indexOf("pbj=1")!=-1){
             	var newParams = JSON.parse(realXHR.responseText);
             	console.log(newParams);
-            	for(var i=0;i<newParams.length;i++){if(newParams[i].player !=null){window.ytplayer.config.args = newParams[i].player.args;break;}}
+            	for(var i=0;i<newParams.length;i++){if(newParams[i].player !=null){
+                    if(!window.ytplayer.config){
+                        window.ytplayer.config = {};
+                    }
+                    window.ytplayer.config.args = newParams[i].player.args;
+                    break;
+                }}
             } 
         }
     }, false);
