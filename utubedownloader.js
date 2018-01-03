@@ -5,9 +5,9 @@ function newXHR() {
     realXHR.addEventListener("readystatechange", function() {
         if(realXHR.readyState==4 && realXHR.status==200){
             if(realXHR.responseURL.indexOf("pbj=1")!=-1){
-            	var newParams = JSON.parse(realXHR.responseText);
-            	console.log(newParams);
-            	for(var i=0;i<newParams.length;i++){if(newParams[i].player !=null){
+                var newParams = JSON.parse(realXHR.responseText);
+                console.log(newParams);
+                for(var i=0;i<newParams.length;i++){if(newParams[i].player !=null){
                     if(!window.ytplayer.config){
                         window.ytplayer.config = {};
                     }
@@ -19,7 +19,7 @@ function newXHR() {
     }, false);
     return realXHR;
 }
-window.XMLHttpRequest = newXHR;
+
 var video_page;
 var strr = document.URL;
 var mainpage = 0;
@@ -27,7 +27,7 @@ var playerContainer = document.getElementById("player-container")||document.getE
 if (strr.match(/youtube/gi)) {
     video_page = "yt";
     mainpage = 1;
-
+    window.XMLHttpRequest = newXHR;
     function checkpagechanges() {
         if (video_page != "yt"){return false;};
         var topPos = (document.getElementById("top") || document.getElementById("player")).offsetTop;
@@ -151,22 +151,21 @@ function update_algo(str) {
 }
 var ps1 = document.getElementsByTagName('html')[0].innerHTML;
 if (video_page == "fb") {
-    var x = 1;
     //document.querySelectorAll('[data-sigil="inlineVideo"]')[0].getAttribute('data-store')
     /*
     var allscripts = document.getElementsByTagName("script");
     for(var i=0;i<allscripts.length;i++){
 
-    	var scriptHtml = allscripts[i].innerHTML;
-    	if(scriptHtml.indexOf('VideoPlayerController')!=-1){
-    		console.log(scriptHtml);
-    		break;
-    	}
+        var scriptHtml = allscripts[i].innerHTML;
+        if(scriptHtml.indexOf('VideoPlayerController')!=-1){
+            console.log(scriptHtml);
+            break;
+        }
     }
     */
     ispan.style.top = ispan.style.left = drop.style.left = '0px';
     drop.style.top = '25px';
-    var parentElement = document.getElementById("fbPhotoSnowliftInlineEditor")||document.getElementById("photoborder");
+    var parentElement = document.querySelectorAll('[aria-label="Dialog content"]')[0].getElementsByTagName('video')[0].parentNode||document.getElementById("photoborder");
     parentElement.appendChild(ispan);
     parentElement.appendChild(drop);
     //var str = new String(ps1);
@@ -179,11 +178,38 @@ if (video_page == "fb") {
     //var hd_video = video_data.substring(1, video_data.indexOf('",'));
     //video_data = video_data.split('"sd_src":')[1];
     //var sd_video = video_data.substring(1, video_data.indexOf('",'));
-    var video_data = document.getElementsByTagName('video')[0].src;
-    drop.innerHTML = "1. <a href='" + video_data + "' type='video/mp4' title='Hd' download='" + title + ".mp4' >" + title + ".mp4</a></br>"
-    //drop.innerHTML += "2. <a href='" + sd_video.replace(/\\\//g, "/") + "' title='Sd' download='" + title + "(SD)' >" + title + "(SD)</a></br>"
-    drop.innerHTML += updateinfo;
-    ispan.innerHTML = 'Download (' + x + ')';
+    //var video_data = document.getElementsByTagName('video')[0].src;
+    var FgPageContent = "";
+    var mypage = new XMLHttpRequest();
+    mypage.open('GET',location.href,true)
+    mypage.addEventListener("readystatechange", function() {
+        if(mypage.readyState==4 && mypage.status==200){
+                FgPageContent = mypage.responseText;
+                var ss = /dash_manifest:"([\s\S]*?)(",)/gi.exec(FgPageContent);
+                var x = 0;
+                if(ss.length>0){
+                    var parser = new DOMParser();
+                    var xmlDoc = parser.parseFromString(ss[1].replace(/\\x3C/gi,'<').replace(/\\n/gi,'').replace(/\\"/gi,'"'),"text/xml");
+                    var Representation = xmlDoc.getElementsByTagName("Representation")
+                    for(var i=0;i<Representation.length;i++){
+                        x++;
+                        var quallabel = Representation[i].getAttribute("FBQualityLabel");
+                        var qualClass = Representation[i].getAttribute("FBQualityClass");
+                        var baseurl = Representation[i].getElementsByTagName('BaseURL')[0].innerHTML.replace('&amp;','&');
+                        var newTitle = title+' '+quallabel+' '+quallabel;
+                        drop.innerHTML += String(i+1)+". <a href='" + baseurl + "' type='video/mp4' title='Hd' download='  target='_blank'" + title + ".mp4' >" + newTitle + ".mp4</a></br>";
+                        
+                    }
+                    
+                    //drop.innerHTML = "1. <a href='" + video_data + "' type='video/mp4' title='Hd' download='" + title + ".mp4' >" + title + ".mp4</a></br>"
+                    //drop.innerHTML += "2. <a href='" + sd_video.replace(/\\\//g, "/") + "' title='Sd' download='" + title + "(SD)' >" + title + "(SD)</a></br>"
+                    drop.innerHTML += updateinfo;
+                    ispan.innerHTML = 'Download (' + x + ')';
+                }                
+        }
+    }, false);
+    mypage.send();
+    
 
 
 
