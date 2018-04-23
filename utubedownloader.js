@@ -1,5 +1,5 @@
 
-var oldXHR = window.XMLHttpRequest;
+var oldXHR = "";
 function newXHR() {
     var realXHR = new oldXHR();
     realXHR.addEventListener("readystatechange", function() {
@@ -19,6 +19,33 @@ function newXHR() {
     }, false);
     return realXHR;
 }
+function GetAlgo(callback){
+    var dd = document.getElementsByTagName('html')[0].outerHTML;
+    var regex = /"js":"(.*?base\.js)/gi;
+    var src = "https://www.youtube.com"+regex.exec(dd)[1].replace(/\\/gi,"");
+
+    var xhttp = new(window.XMLHttpRequest || ActiveXObject)('Microsoft.XMLHTTP');
+    xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            var content = xhttp.responseText;
+            var keyword = '"signature",';
+            var startingIndex = content.indexOf(keyword);
+            var sigfun = content.substr(startingIndex+keyword.length,2);
+            var algo1Keyword = '=function(a){a=a.split("");';
+            var algo = content.substr(content.indexOf(sigfun+algo1Keyword));
+            var algo1 = algo.substr(0,algo.indexOf("};")+1);
+            var algo2fun = algo1.split(";")[2].substr(0,2);
+            var algo2str = content.substr(content.indexOf("var "+algo2fun+"="));
+            var algo2 = algo2str.substr(0,algo2str.indexOf('}};')+3);
+            var algo1 = algo1.replace(sigfun,"tq");
+            var totalalgo = algo2+";"+algo1+";";
+            callback(totalalgo);
+            return;
+        }
+    };
+    xhttp.open("GET", src, false);
+    xhttp.send();
+}
 
 var video_page;
 var strr = document.URL;
@@ -27,6 +54,7 @@ var playerContainer = document.getElementById("player-container")||document.getE
 if (strr.match(/youtube/gi)) {
     video_page = "yt";
     mainpage = 1;
+    oldXHR = window.XMLHttpRequest;
     window.XMLHttpRequest = newXHR;
     function checkpagechanges() {
         if (video_page != "yt"){return false;};
@@ -165,7 +193,15 @@ if (video_page == "fb") {
     */
     ispan.style.top = ispan.style.left = drop.style.left = '0px';
     drop.style.top = '25px';
-    var parentElement = document.querySelectorAll('[aria-label="Dialog content"]')[0].getElementsByTagName('video')[0].parentNode||document.getElementById("photoborder");
+    var photoVideo =null;
+    if(document.querySelectorAll('[aria-label="Facebook Photo Theater"]').length>0){
+        drop.style.top = 'auto';
+        ispan.style.top='auto';
+        drop.style.bottom = '70px';
+        ispan.style.bottom = '45px';
+        photoVideo = document.querySelectorAll('[aria-label="Facebook Photo Theater"]')[0].getElementsByTagName('video')[0].parentNode;
+    }
+    var parentElement =photoVideo||document.querySelectorAll('[aria-label="Dialog content"]')[0].getElementsByTagName('video')[0].parentNode||document.getElementById("photoborder");
     parentElement.appendChild(ispan);
     parentElement.appendChild(drop);
     //var str = new String(ps1);
@@ -195,8 +231,12 @@ if (video_page == "fb") {
                         x++;
                         var quallabel = Representation[i].getAttribute("FBQualityLabel");
                         var qualClass = Representation[i].getAttribute("FBQualityClass");
+                        if(!quallabel){
+                            quallabel = 'audio';
+                            qualClass = 'hd';
+                        }
                         var baseurl = Representation[i].getElementsByTagName('BaseURL')[0].innerHTML.replace('&amp;','&');
-                        var newTitle = title+' '+quallabel+' '+quallabel;
+                        var newTitle = title+' '+quallabel+' '+qualClass;
                         drop.innerHTML += String(i+1)+". <a href='" + baseurl + "' type='video/mp4' title='Hd'   target='_blank' download='" + title + ".mp4' >" + newTitle + ".mp4</a></br>";
                         
                     }
@@ -344,18 +384,21 @@ if (video_page == "fb") {
                     case "s":
                         if (sign == 1 && typeof tq == 'undefined') {
                             var code = '';
-                            x = new(window.XMLHttpRequest || ActiveXObject)('Microsoft.XMLHTTP');
-                            x.onreadystatechange = function() {
-                                if (x.readyState == 4) {
-                                    if (x.status == 200) {
-                                        code = JSON.parse(x.responseText).url;
-                                        code = decodeURIComponent(code);
-                                        console.log("got this");
-                                    } else console.log('ERR', x.status, x.statusText)
-                                }
-                            };
-                            x.open('GET', 'https://gluonchat.herokuapp.com/get_algo.php', false);
-                            x.send();
+                            GetAlgo(function(returnCode){
+                                code = returnCode;
+                            })
+                            // x = new(window.XMLHttpRequest || ActiveXObject)('Microsoft.XMLHTTP');
+                            // x.onreadystatechange = function() {
+                            //     if (x.readyState == 4) {
+                            //         if (x.status == 200) {
+                            //             code = JSON.parse(x.responseText).url;
+                            //             code = decodeURIComponent(code);
+                            //             console.log("got this");
+                            //         } else console.log('ERR', x.status, x.statusText)
+                            //     }
+                            // };
+                            // x.open('GET', 'https://gluonchat.herokuapp.com/get_algo.php', false);
+                            // x.send();
                             //eval(code);
                             script_ele = window.document.createElement("script");
                             script_ele.innerHTML = code;
