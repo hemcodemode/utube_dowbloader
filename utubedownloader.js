@@ -19,6 +19,10 @@ function newXHR() {
     }, false);
     return realXHR;
 }
+String.prototype.regexIndexOf = function(regex, startpos) {
+    var indexOf = this.substring(startpos || 0).search(regex);
+    return (indexOf >= 0) ? (indexOf + (startpos || 0)) : indexOf;
+}
 function GetAlgo(callback){
     var dd = document.getElementsByTagName('html')[0].outerHTML;
     var regex = /"js":"(.*?base\.js)/gi;
@@ -28,9 +32,11 @@ function GetAlgo(callback){
     xhttp.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {
             var content = xhttp.responseText;
-            var keyword = '"signature",';
-            var startingIndex = content.indexOf(keyword);
-            var sigfun = content.substr(startingIndex+keyword.length,2);
+            //var keyword = '"signature",';
+            var keyword = /\.set\(.\.sp,/;
+            //var startingIndex = content.indexOf(keyword);
+            var startingIndex = content.regexIndexOf(keyword);
+            var sigfun = content.substr(startingIndex+'.set(..sp,'.length,2);
             var algo1Keyword = '=function(a){a=a.split("");';
             var algo = content.substr(content.indexOf(sigfun+algo1Keyword));
             var algo1 = algo.substr(0,algo.indexOf("};")+1);
@@ -50,7 +56,7 @@ function GetAlgo(callback){
 var video_page;
 var strr = document.URL;
 var mainpage = 0;
-var playerContainer = document.getElementById("player-container")||document.getElementById("player-api");
+var playerContainer = document.getElementById("primary-inner")||document.getElementById("player-api");
 if (strr.match(/youtube/gi)) {
     video_page = "yt";
     mainpage = 1;
@@ -58,8 +64,8 @@ if (strr.match(/youtube/gi)) {
     window.XMLHttpRequest = newXHR;
     function checkpagechanges() {
         if (video_page != "yt"){return false;};
-        var topPos = (document.getElementById("top") || document.getElementById("player")).offsetTop;
-        var LeftPos = playerContainer.offsetLeft+(document.getElementById("top") || document.getElementById("player")).offsetLeft;
+        var topPos = (document.getElementById("top") || document.getElementById("primary-inner")).offsetTop;
+        var LeftPos = playerContainer.offsetLeft;
         ispan.style.top = topPos+'px';
         ispan.style.left = LeftPos+'px';
         drop.style.top = topPos+23+'px';
@@ -237,7 +243,7 @@ if (video_page == "fb") {
                         }
                         var baseurl = Representation[i].getElementsByTagName('BaseURL')[0].innerHTML.replace('&amp;','&');
                         var newTitle = title+' '+quallabel+' '+qualClass;
-                        drop.innerHTML += String(i+1)+". <a href='" + baseurl + "' type='video/mp4' title='Hd'   target='_blank' download='" + title + ".mp4' >" + newTitle + ".mp4</a></br>";
+                        drop.innerHTML += String(i+1)+". <a target='_blank' href='" + baseurl + "' type='video/mp4' title='Hd'   target='_blank' download='" + title + ".mp4' >" + newTitle + ".mp4</a></br>";
                         
                     }
                     
@@ -337,8 +343,8 @@ if (video_page == "fb") {
 
     function showdownloadinfo() {
         drop.innerHTML = ""; 
-        var topPos = (document.getElementById("top") || document.getElementById("player")).offsetTop;
-        var LeftPos = playerContainer.offsetLeft+(document.getElementById("top") || document.getElementById("player")).offsetLeft;;
+        var topPos = (document.getElementById("top") || document.getElementById("primary-inner")).offsetTop;
+        var LeftPos = playerContainer.offsetLeft;
         ispan.style.top = topPos+'px';
         ispan.style.left = LeftPos+'px';
         drop.style.top = topPos+23+'px';
@@ -417,7 +423,7 @@ if (video_page == "fb") {
             urllink2 = [];
         };
         for (var k = 0; k < downloadObject.dlink.length; k++) {
-            drop.innerHTML += k + 1 + ". <a href='" + downloadObject.dlink[k] + "' download ='"+escape(title)+"' title='" + title + "'>" + downloadObject.qual[k] + "</a></br></br>";
+            drop.innerHTML += k + 1 + ". <a target='_blank' href='" + downloadObject.dlink[k] + "' download ='"+escape(title)+"' title='" + title + "'>" + downloadObject.qual[k] + "</a></br></br>";
         }
         drop.innerHTML += updateinfo;
         console.log(downloadObject);
