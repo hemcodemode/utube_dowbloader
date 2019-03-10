@@ -24,6 +24,7 @@ String.prototype.regexIndexOf = function(regex, startpos) {
     return (indexOf >= 0) ? (indexOf + (startpos || 0)) : indexOf;
 }
 function GetAlgo(callback){
+    /* sample code for algo cv=function(a){a=a.split("");bv.Sv(a,2);bv.kT(a,62);bv.Sv(a,3);bv.kT(a,19);bv.Sv(a,1);return a.join("")};*/
     var dd = document.getElementsByTagName('html')[0].outerHTML;
     var regex = /"js":"(.*?base\.js)/gi;
     var src = "https://www.youtube.com"+regex.exec(dd)[1].replace(/\\/gi,"");
@@ -34,9 +35,11 @@ function GetAlgo(callback){
             var content = xhttp.responseText;
             //var keyword = '"signature",';
             var keyword = /\.set\(.\.sp,/;
+            keyword = /(var |;)?(.{1,3}?)=function\(a\){a=a\.split\(""\);/;
             //var startingIndex = content.indexOf(keyword);
-            var startingIndex = content.regexIndexOf(keyword);
-            var sigfun = content.substr(startingIndex+'.set(..sp,'.length,2);
+            //var startingIndex = content.regexIndexOf(keyword);
+            //var sigfun = content.substr(startingIndex+'.set(..sp,'.length,2);
+            var sigfun = keyword.exec(content)[2];
             var algo1Keyword = '=function(a){a=a.split("");';
             var algo = content.substr(content.indexOf(sigfun+algo1Keyword));
             var algo1 = algo.substr(0,algo.indexOf("};")+1);
@@ -353,6 +356,7 @@ if (video_page == "fb") {
         ispan.style.display = 'block';
         var title = window.ytplayer.config.args.title;
         var fmt_streams = window.ytplayer.config.args.url_encoded_fmt_stream_map;
+        //var fmt_streams = window.ytplayer.config.args.adaptive_fmts;
         ispan.innerHTML = 'Loading......';
         if (mainpage) {
             ispan.innerHTML = '...Youtube...';
@@ -534,3 +538,6 @@ function checkpagetrans() {
 
 }
 void(0);
+
+
+
