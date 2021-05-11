@@ -27,8 +27,8 @@ function GetAlgo(callback){
     /* sample code for algo cv=function(a){a=a.split("");bv.Sv(a,2);bv.kT(a,62);bv.Sv(a,3);bv.kT(a,19);bv.Sv(a,1);return a.join("")};*/
     var dd = document.getElementsByTagName('html')[0].outerHTML;
     var regex = /"js":"(.*?base\.js)/gi;
-    var src = "https://www.youtube.com"+regex.exec(dd)[1].replace(/\\/gi,"");
-
+    /*var src = "https://www.youtube.com"+regex.exec(dd)[1].replace(/\\/gi,"");*/
+    var src = "https://www.youtube.com"+ytplayer.web_player_context_config.jsUrl;
     var xhttp = new(window.XMLHttpRequest || ActiveXObject)('Microsoft.XMLHTTP');
     xhttp.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {
